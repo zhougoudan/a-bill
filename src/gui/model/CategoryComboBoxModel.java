@@ -16,6 +16,7 @@ public class CategoryComboBoxModel implements ComboBoxModel<String>{
         cs.add("住宿");
         cs.add("话费");
         int i = 1;
+        int j =2;
         c = cs.get(0);
     }
 
