@@ -15,6 +15,7 @@ public class CategoryComboBoxModel implements ComboBoxModel<String>{
         cs.add("交通");
         cs.add("住宿");
         cs.add("话费");
+        int i = 1;
         c = cs.get(0);
     }
 
