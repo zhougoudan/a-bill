@@ -1,86 +1,123 @@
 package dao;
 
-import entity.Config;
-import util.DBUtil;
+import java.sql.Connection;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import entity.Config;
+import util.DBUtil;
+
 public class ConfigDAO {
-    public int getTotal(){
+
+    public int getTotal() {
         int total = 0;
-        try(Connection c = DBUtil.getConnection(); Statement s = c.createStatement()) {
-            String sql = "SELECT * FROM config";
+        try (Connection c = DBUtil.getConnection(); Statement s = c.createStatement();) {
+
+            String sql = "select count(*) from config";
+
             ResultSet rs = s.executeQuery(sql);
             while (rs.next()) {
                 total = rs.getInt(1);
             }
 
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            System.out.println("total:" + total);
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
         }
         return total;
     }
 
+    public void add(Config config) {
 
-    public void add(Config config){
-        String sql = "INSERT INTO config VALUES(null,?,?";
-        try(Connection c = DBUtil.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1,config.key);
-            ps.setString(2,config.value);
+        String sql = "insert into config values(null,?,?)";
+        try (Connection c = DBUtil.getConnection(); PreparedStatement ps = c.prepareStatement(sql);) {
+            ps.setString(1, config.key);
+            ps.setString(2, config.value);
             ps.execute();
             ResultSet rs = ps.getGeneratedKeys();
-            while (rs.next()){
+            if (rs.next()) {
                 int id = rs.getInt(1);
                 config.id = id;
             }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        } catch (SQLException e) {
+
+            e.printStackTrace();
         }
     }
 
-    public void update(Config config){
-         String sql = "UPDATE config SET key_=?, value=?, WHERE id = ?";
-         try(Connection c = DBUtil.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-             ps.setString(1,config.key);
-             ps.setString(2,config.value);
-             ps.setInt(3,config.id);
-             ps.execute();
-         } catch (SQLException throwables) {
-             throwables.printStackTrace();
-         }
+    public void update(Config config) {
+
+        String sql = "update config set key_= ?, value=? where id = ?";
+        try (Connection c = DBUtil.getConnection(); PreparedStatement ps = c.prepareStatement(sql);) {
+
+            ps.setString(1, config.key);
+            ps.setString(2, config.value);
+            ps.setInt(3, config.id);
+
+            ps.execute();
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+        }
+
     }
 
-    public void delete(int id){
-        String sql = "DELETE FROM config WHERE id=" + id;
-        try(Connection c = DBUtil.getConnection(); Statement s = c.createStatement()) {
+    public void delete(int id) {
+
+        try (Connection c = DBUtil.getConnection(); Statement s = c.createStatement();) {
+
+            String sql = "delete from config where id = " + id;
+
             s.execute(sql);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
         }
     }
 
-    public Config get(int id){
-        String sql = "SELECT * FROM config WHERE id=" + id;
-        Config config = new Config();
+    public Config get(int id) {
+        Config config = null;
 
-        try(Connection c = DBUtil.getConnection(); Statement s = c.createStatement()){
+        try (Connection c = DBUtil.getConnection(); Statement s = c.createStatement();) {
+
+            String sql = "select * from config where id = " + id;
+
             ResultSet rs = s.executeQuery(sql);
-            if (rs.next()){
-                config.key = rs.getString("key_");
-                config.value = rs.getString("value");
+
+            if (rs.next()) {
+                config = new Config();
+                String key = rs.getString("key_");
+                String value = rs.getString("value");
+                config.key = key;
+                config.value = value;
                 config.id = id;
             }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
         }
         return config;
     }
 
-    public List<Config> list(int start,int count){
+    public List<Config> list() {
+        return list(0, Short.MAX_VALUE);
+    }
+
+    public List<Config> list(int start, int count) {
         List<Config> configs = new ArrayList<Config>();
-        String sql = "SELECT * FROM config ORDER BY id DESC limit ?,?";
+
+        String sql = "select * from config order by id desc limit ?,? ";
+
         try (Connection c = DBUtil.getConnection(); PreparedStatement ps = c.prepareStatement(sql);) {
 
             ps.setInt(1, start);
