@@ -8,10 +8,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import service.ConfigService;
 import util.ColorUtil;
 import util.GUIUtil;
 
-public class ConfigPanel extends JPanel {
+public class ConfigPanel extends WorkingPanel {
 //    static{
 //        GUIUtil.useLNF();
 //    }
@@ -50,4 +51,17 @@ public class ConfigPanel extends JPanel {
         GUIUtil.showPanel(ConfigPanel.instance);
     }
 
+    @Override
+    public void updateData() {
+        String budget = new ConfigService().get(ConfigService.budget);
+        String mysqlPath = new ConfigService().get(ConfigService.mysqlPath);
+        tfBudget.setText(budget);
+        tfMysqlPath.setText(mysqlPath);
+        tfBudget.grabFocus();
+    }
+
+    @Override
+    public void addListener() {
+
+    }
 }
